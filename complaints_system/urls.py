@@ -13,6 +13,7 @@ urlpatterns = [
     path('complaints/', include('complaints.urls')),
     path('authorities/', include(('authorities.urls', 'authorities'), namespace='authorities')),
     path('accounts/', include('allauth.urls')),
+    path('notifications/', include('notifications.urls')),
 ]
 
 # Add this to serve media files during development

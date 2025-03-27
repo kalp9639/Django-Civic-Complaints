@@ -33,12 +33,14 @@ INSTALLED_APPS = [
     "accounts",
     "complaints",
     "authorities",
+    "notifications",
     "django_celery_beat",
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django.contrib.humanize', # Add this for 'timesince'
 ]
 
 MIDDLEWARE = [
@@ -68,6 +70,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 'accounts.context_processors.base_context',
+                'notifications.context_processors.notifications',
             ],
         },
     },
@@ -262,3 +265,13 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+# Twilio Configuration (Use environment variables in production!)
+TWILIO_ACCOUNT_SID = 'ACf08710e35ac8115e2369a14eb593acf2' # Replace with your Account SID
+TWILIO_AUTH_TOKEN = 'f639f872ac140970c0239e7909e89d26'    # Replace with your Auth Token
+TWILIO_PHONE_NUMBER = '+19702367027'                     # Replace with your Twilio phone number
+
+# Make sure this matches your actual domain in production (e.g., 'https://yourdomain.com')
+SITE_DOMAIN = 'http://127.0.0.1:8000' # Use http for local development
+
+DEFAULT_COUNTRY_CODE = '91'

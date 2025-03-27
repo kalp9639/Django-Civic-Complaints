@@ -3,6 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.urls import reverse
 import os
 
 class Complaint(models.Model):
@@ -45,6 +46,10 @@ class Complaint(models.Model):
         self.is_permanently_deleted = True
         self.permanently_deleted_at = timezone.now()
         self.save()
+
+    def get_absolute_url(self):
+        # Assuming you have a named URL pattern for complaint detail
+        return reverse('complaint_detail', kwargs={'pk': self.pk})
 
     '''
     def delete(self, *args, **kwargs):
