@@ -109,28 +109,31 @@ def send_complaint_update_sms(recipient_user, complaint, update_instance):
 def complaint_created_notification(sender, instance, created, **kwargs):
     """
     Notify the user (on-site notification) when their complaint is created.
+    The verb starts with "You..." and the actor is set to None.
     """
     if created:
         try:
+            # Verb starts directly with "You..."
             verb_text = f'You submitted a {instance.get_complaint_type_display()} complaint'
             if instance.ward_number:
-                verb_text += f' in {instance.ward_number}'
+                verb_text += f' in ward {instance.ward_number}'
 
             Notification.objects.create(
                 recipient=instance.user,
-                actor=instance.user,
+                actor=None, # Set actor to None for self-notifications
                 verb=verb_text,
                 target=instance
             )
             logger.info(f"On-site notification created for new complaint {instance.id} for user {instance.user.username}")
+        
         except Exception as e:
              logger.error(f"Error creating on-site notification for new complaint {instance.id}: {e}", exc_info=True)
-
 
 @receiver(post_save, sender=ComplaintUpdate)
 def complaint_status_updated_notification(sender, instance, created, **kwargs):
     """
     Handles notifications (on-site and SMS) when an official updates a complaint.
+    Verb now describes the action, status is retrieved from action_object.
     """
     if created:
         try:
@@ -139,25 +142,25 @@ def complaint_status_updated_notification(sender, instance, created, **kwargs):
             actor = instance.official.user
             actor_name = actor.get_full_name() or actor.username
 
-            # --- 1. Create On-Site Notification ---
+            # --- 1. Create On-Site Notification (Modified Verb) ---
+            # Verb describes the action, not the result status
             verb_text = (
-                f'{actor_name} updated the status of your '
-                f'{complaint.get_complaint_type_display()} complaint (#{complaint.id}) '
-                f'to "{instance.status}"'
+                f'updated your {complaint.get_complaint_type_display()} complaint '
             )
+            if complaint.ward_number:
+                verb_text += f' in ward {complaint.ward_number}'
+
             Notification.objects.create(
                 recipient=recipient,
                 actor=actor,
-                verb=verb_text,
+                verb=verb_text, # Store the modified verb
                 target=complaint,
-                action_object=instance
+                action_object=instance # Link to ComplaintUpdate holds the new status
             )
             logger.info(f"On-site notification created for complaint update {instance.id} for user {recipient.username}")
 
             # --- 2. Send SMS Notification ---
-            # Call the helper function to handle SMS sending logic
             send_complaint_update_sms(recipient_user=recipient, complaint=complaint, update_instance=instance)
 
         except Exception as e:
-            # Catch errors during notification creation/SMS trigger
             logger.error(f"Error processing complaint update notification (Update ID: {instance.id}): {e}", exc_info=True)

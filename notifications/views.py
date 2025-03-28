@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.urls import reverse
 from django.contrib import messages # Import messages framework
 from .models import Notification
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from complaints.models import Complaint # Import the Complaint model
 import logging
 
@@ -53,18 +54,18 @@ def notification_redirect(request, notification_id):
         if complaint.is_permanently_deleted:
             messages.warning(
                 request,
-                f"Unable to fetch the complaint (ID: {complaint_id_for_msg}). It has been permanently deleted."
+                f"Unable to fetch the complaint. It has been permanently deleted."
             )
             return redirect(reverse('all_notifications_list')) # Redirect to home or 'all_notifications_list'
 
         elif complaint.is_trashed:
             messages.info(
                 request,
-                f"Unable to fetch the complaint (ID: {complaint_id_for_msg}). It is currently in the trash bin."
+                f"Unable to fetch the complaint. It is currently in the trash bin."
             )
             # Optional: Redirect to trash bin instead?
             # return redirect(reverse('trash_bin'))
-            return redirect(reverse('all_notifications_list')) # Redirect to home or 'all_notifications_list'
+            return redirect(reverse('trash_bin')) # Redirect 'all_notifications_list'
 
         else:
             # Complaint exists and is accessible, try to get its URL
@@ -97,13 +98,31 @@ def notification_redirect(request, notification_id):
         return redirect(reverse('home')) # Redirect home as a safe fallback
 
 
-# Optional: Page to view all notifications
 @login_required
 def all_notifications_list(request):
-    all_notifs = Notification.objects.filter(recipient=request.user).select_related('actor')
-    # Consider pagination for large numbers of notifications
-    # from django.core.paginator import Paginator
-    # paginator = Paginator(all_notifs, 25) # Show 25 notifications per page.
-    # page_number = request.GET.get('page')
-    # page_obj = paginator.get_page(page_number)
-    return render(request, 'notifications/all_notifications.html', {'notifications': all_notifs}) # Pass page_obj instead if using pagination
+    # Get all notifications for the user, ordered by timestamp
+    notification_list = Notification.objects.filter(recipient=request.user).select_related('actor')
+
+    # Set up Paginator
+    paginator = Paginator(notification_list, 15) # Show 15 notifications per page
+    page_number = request.GET.get('page') # Get page number from request query parameters
+
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        page_obj = paginator.page(paginator.num_pages)
+
+    # Get the unread count separately for the header button logic
+    unread_count = Notification.objects.filter(recipient=request.user, unread=True).count()
+
+    context = {
+        # 'notifications': page_obj, # Pass the page object
+        'page_obj': page_obj,      # Use 'page_obj' which is standard Django convention
+        'is_paginated': True,      # Let the template know pagination is active
+        'unread_notification_count': unread_count # Still needed for the header button
+    }
+    return render(request, 'notifications/all_notifications.html', context)

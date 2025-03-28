@@ -56,16 +56,42 @@
             margin-top: auto; /* Push footer to bottom */
         }
 
-        /* Style for the notification badge on the navbar button */
-        .navbar .btn .badge {
-            font-size: 0.65em; /* Adjust size */
-            padding: 0.25em 0.45em; /* Adjust padding */
-            vertical-align: top; /* Align badge nicely */
-        }
-
         /* Ensure offcanvas body allows scrolling if content exceeds height */
         .offcanvas-body {
             overflow-y: auto;
+        }
+        /* Bell Icon Styling */
+        .navbar .bi-bell-fill {
+            font-size: 1.1rem; /* Similar to other navbar icons */
+            color: #ffffff;
+            vertical-align: middle;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .navbar .btn-secondary {
+            padding: 6px 8px;
+            background-color: transparent;
+            border: none;
+        }
+
+        .navbar .btn-secondary:hover .bi-bell-fill {
+            color: #ffc107;
+            transform: scale(1.1);
+        }
+
+        /* Badge Positioning - Clean */
+        .navbar .badge {
+            font-size: 0.6rem;
+            padding: 3px 5px;
+        }
+
+        .navbar .btn-secondary .badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.65rem;
+            padding: 3px 5px;
+            transform: none;
         }
 
     </style>
@@ -110,23 +136,29 @@
                                 </li>
                             {% endif %}
                             
-                            {# --- Notification Trigger Button --- #}
-                            <li class="nav-item ms-2"> {# Added margin for spacing #}
+                            {# --- Notification Trigger Button (Only for Non-Officials) --- #}
+                            {% if not is_official %} 
+                            <li class="nav-item ms-1"> 
                                 <button class="btn btn-secondary position-relative" type="button" data-bs-toggle="offcanvas" data-bs-target="#notificationSlider" aria-controls="notificationSlider">
                                     <i class="bi bi-bell-fill"></i>
-                                    {# Badge for unread count - provided by context processor #}
                                     {% if unread_notification_count > 0 %}
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    <span class="badge rounded-pill bg-danger">
                                         {{ unread_notification_count }}
-                                        <span class="visually-hidden">unread notifications</span>
                                     </span>
                                     {% endif %}
                                 </button>
                             </li>
+                            {% endif %} {# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #}
                             {# --- End Notification Trigger Button --- #}
 
+                            {# Inside the {% if user.is_authenticated %} block in base.html #}
+
                             <li class="nav-item ms-2"> {# Added margin for spacing #}
-                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                                {# Add onclick attribute for confirmation #}
+                                <a class="nav-link" href="{% url 'logout' %}"
+                                onclick="return confirm('Are you sure you want to logout?');">
+                                Logout
+                                </a>
                             </li>
                         {% else %}
                             <!-- Guests' Navbar -->
