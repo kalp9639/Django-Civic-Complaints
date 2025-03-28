@@ -3,18 +3,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import HttpResponseRedirect, Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponseRedirect
 from django.urls import reverse
-from django.contrib import messages # Import messages framework
+from django.contrib import messages 
 from .models import Notification
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from complaints.models import Complaint # Import the Complaint model
+from complaints.models import Complaint 
 import logging
 
 logger = logging.getLogger(__name__)
 
 @login_required
-@require_POST # Use POST for actions that change state
+@require_POST 
 def mark_all_notifications_read(request):
     """Marks all unread notifications for the current user as read."""
     try:
@@ -24,7 +24,6 @@ def mark_all_notifications_read(request):
         logger.error(f"Error marking all notifications read for user {request.user.username}: {e}", exc_info=True)
         messages.error(request, "Could not mark all notifications as read.")
 
-    # Redirect back to the referring page
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
 @login_required
