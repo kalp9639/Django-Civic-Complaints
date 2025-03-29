@@ -20,10 +20,28 @@ def mark_all_notifications_read(request):
     try:
         updated_count = Notification.objects.filter(recipient=request.user, unread=True).update(unread=False)
         logger.info(f"Marked {updated_count} notifications as read for user {request.user.username}")
+        
+        # Check if this is an AJAX request (from notification slider)
+        is_ajax_request = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        if is_ajax_request:
+            # Return JSON response for AJAX requests
+            return JsonResponse({
+                'success': True,
+                'message': f'Marked {updated_count} notifications as read',
+                'updated_count': updated_count
+            })
     except Exception as e:
         logger.error(f"Error marking all notifications read for user {request.user.username}: {e}", exc_info=True)
         messages.error(request, "Could not mark all notifications as read.")
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'message': 'Could not mark all notifications as read'
+            }, status=500)
 
+    # For non-AJAX requests, redirect as before
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
 @login_required

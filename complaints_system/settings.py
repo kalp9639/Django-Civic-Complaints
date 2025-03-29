@@ -6,8 +6,10 @@ Django settings for complaints_system project.
 from pathlib import Path
 import os
 from django.conf import settings
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure--*hxuv(2%a0u8qgs+693_85p48uso0iooc(gni_rdenb(8ykye"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,11 +86,11 @@ WSGI_APPLICATION = "complaints_system.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'new_complaints',
-        'USER': 'postgres',
-        'PASSWORD': 'kalp',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
@@ -136,8 +138,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = 'login'
-# LOGIN_REDIRECT_URL = 'home'
-# LOGOUT_REDIRECT_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -145,12 +145,12 @@ WARD_BOUNDARY_KMZ_PATH = os.path.join(BASE_DIR, 'util', 'Ward_Boundary.kmz')
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Or your email service provider
-EMAIL_PORT = 587
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'kalp9639@gmail.com' # Replace with your email
-EMAIL_HOST_PASSWORD = 'iswr evez ffro gipv' # Replace with your app password
-DEFAULT_FROM_EMAIL = 'Civic Complaints System <kalp9639@gmail.com>'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f'Civic Complaints System <{os.environ.get("EMAIL_HOST_USER")}>'
 
 # Complaint Submission Throttling Config
 COMPLAINT_SUBMISSION_LIMIT = 3  # Number of complaints allowed
@@ -252,8 +252,8 @@ LOGGING['loggers']['allauth'] = {
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': '139440909524-qvvq9v9ok8i8dl8s1uqapjpjbksp4ca5.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
             'key': ''  
         },
         'SCOPE': [
@@ -266,12 +266,12 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# Twilio Configuration (Use environment variables in production!)
-TWILIO_ACCOUNT_SID = 'ACf08710e35ac8115e2369a14eb593acf2' # Replace with your Account SID
-TWILIO_AUTH_TOKEN = 'f639f872ac140970c0239e7909e89d26'    # Replace with your Auth Token
-TWILIO_PHONE_NUMBER = '+19702367027'                     # Replace with your Twilio phone number
+# Twilio Configuration
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')
 
-# Make sure this matches your actual domain in production (e.g., 'https://yourdomain.com')
-SITE_DOMAIN = 'http://127.0.0.1:8000' # Use http for local development
+# Site domain configuration
+SITE_DOMAIN = os.environ.get('SITE_DOMAIN')
 
 DEFAULT_COUNTRY_CODE = '91'

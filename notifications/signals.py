@@ -62,13 +62,13 @@ def send_complaint_update_sms(recipient_user, complaint, update_instance):
             complaint_url = None
 
         # 4. Construct the SMS message body (Improved)
-        greeting = "Greetings from the Civic Complaints App!\n"
-        update_line = f"Your {complaint_type} complaint (ID: {complaint_id})"
+        greeting = "\n\nGreetings from the Civic Complaints App!\n"
+        update_line = f"Your {complaint_type} complaint"
         if complaint.ward_number:
             update_line += f" in ward {complaint.ward_number}" # Add ward number if available
         update_line += f" has been updated."
 
-        status_line = f"New Status: '{new_status}' (Updated by {official_name})."
+        status_line = f"==== New Status ====\n{new_status}\n(Updated by {official_name})"
 
         # Combine the parts
         message_parts = [
