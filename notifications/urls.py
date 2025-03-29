@@ -5,7 +5,7 @@ from . import views
 # app_name = 'notifications' # Optional: Add namespace if needed
 
 urlpatterns = [
-    path('mark-all-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
-    path('redirect/<int:notification_id>/', views.notification_redirect, name='notification_redirect'),
-    path('all/', views.all_notifications_list, name='all_notifications_list'),
+    path('mark-all-read/', views.MarkAllNotificationsReadView.as_view(), name='mark_all_notifications_read'),
+    path('redirect/<int:notification_id>/', views.NotificationRedirectView.as_view(), name='notification_redirect'),
+    path('all/', views.AllNotificationsListView.as_view(), name='all_notifications_list'),
 ]
