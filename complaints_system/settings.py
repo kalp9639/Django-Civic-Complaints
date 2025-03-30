@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'django.contrib.humanize', # Add this for 'timesince'
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -270,6 +270,7 @@ SOCIALACCOUNT_PROVIDERS = {
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')
+TWILIO_VERIFY_SERVICE_SID = os.environ.get('TWILIO_VERIFY_SERVICE_SID')
 
 # Site domain configuration
 SITE_DOMAIN = os.environ.get('SITE_DOMAIN')
